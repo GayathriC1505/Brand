@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Tracking Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #D4AF37; /* Gold color */
+            overflow-x: hidden;
+        }
+
+        /* Login Page Styles */
+        .login-page {
+            background: url('https://images.unsplash.com/photo-1556740738-b6a63e27c4df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .login-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 2;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 10px;
+            width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #D4AF37;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #D4AF37;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #D4AF37;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid #D4AF37;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #fff;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #D4AF37;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .login-btn:hover {
+            background-color: #c9a227;
+        }
+
+        /* App Container (hidden until login) */
+        .app-container {
+            display: none;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #111;
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: all 0.5s ease;
+            z-index: 100;
+            border-right: 1px solid #D4AF37;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #D4AF37;
+        }
+
+        .sidebar-header h3 {
+            color: #D4AF37;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            list-style: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #222;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu li:hover {
+            background-color: #D4AF37;
+        }
+
+        .sidebar-menu li:hover a {
+            color: #000;
+        }
+
+        .sidebar-menu li a {
+            color: #D4AF37;
+            text-decoration: none;
+            font-size: 1.1rem;
+            display: block;
+        }
+
+        .sidebar-menu li.active {
+            background-color: #D4AF37;
+        }
+
+        .sidebar-menu li.active a {
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.5s ease;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 30px;
+            min-height: calc(100vh - 60px);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #D4AF37;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .section p {
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* Home Section */
+        .welcome-message {
+            background-color: rgba(17, 17, 17, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #D4AF37;
+            margin-bottom: 30px;
+        }
+
+        /* Dashboard Section */
+        .dashboard-container {
+            margin-top: 20px;
+        }
+
+        .dashboard-iframe {
+            width: 102%;
+            height: 1000px;
+            border: 1px solid #D4AF37;
+            border-radius: 5px;
+        }
+
+        /* Output Section */
+        .output-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .dashboard-image {
+            max-width: 100%;
+            border: 1px solid #D4AF37;
+            border-radius: 5px;
+            margin: 20px 0;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Team Styles */
+        .team-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .team-member {
+            background-color: #111;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #D4AF37;
+        }
+
+        .team-member h3 {
+            margin: 15px 0 5px;
+            color: #D4AF37;
+        }
+
+        .team-member p {
+            color: #999;
+        }
+
+        /* Features & Solutions Styles */
+        .features-container, .solutions-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature-card, .solution-card {
+            background-color: #111;
+            padding: 25px;
+            border-radius: 5px;
+            border: 1px solid #D4AF37;
+        }
+
+        .feature-card h3, .solution-card h3 {
+            color: #D4AF37;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #D4AF37;
+            }
+
+            .main-content {
+                margin-left: 0;
+                height: auto;
+            }
+
+            .section {
+                padding: 30px 15px;
+            }
+
+            .login-container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+
+            .dashboard-iframe {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-page">
+        <div class="login-container">
+            <h2>Brand Tracking Dashboard</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- App Container (shown after login) -->
+    <div id="app-container" class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Brand Tracking</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active" data-target="home-section"><a href="#">Home</a></li>
+                <li data-target="about-section"><a href="#">About</a></li>
+                <li data-target="problem-section"><a href="#">Problem</a></li>
+                <li data-target="features-section"><a href="#">Features</a></li>
+                <li data-target="solutions-section"><a href="#">Solutions</a></li>
+                <li data-target="view-dashboard-section"><a href="#">View Dashboard</a></li>
+                <li data-target="output-section"><a href="#">Output</a></li>
+                <li data-target="team-section"><a href="#">Our Team</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Home Section -->
+            <section id="home-section" class="section active">
+                <h2>Dashboard Overview</h2>
+                
+                <div class="welcome-message">
+                    <h3 style="color: #D4AF37; margin-bottom: 15px;">Welcome to Brand Tracking Dashboard</h3>
+                    <p>Track your brand performance across different locations, customer segments, and marketing channels in real-time. Gain valuable insights to optimize your sales, inventory, and marketing strategies.</p>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about-section" class="section">
+                <h2>About The Project</h2>
+                <p>Retail brands like Trends, Max, and Zudio need a smart way to track sales, customer behavior, and inventory in real-time. This project proposes a Brand Tracking Dashboard that combines data analytics and visualization to help businesses make better decisions.</p>
+                <p>The dashboard will provide insights into sales trends, stock levels, marketing performance, and customer preferences, helping brands improve efficiency and customer satisfaction.</p>
+            </section>
+
+            <!-- Problem Statement Section -->
+            <section id="problem-section" class="section">
+                <h2>Problem Statement</h2>
+                <p>Businesses struggle to track brand performance across different locations, customer segments, and marketing channels. Without real-time insights, they face challenges in optimizing sales, inventory, and marketing strategies.</p>
+                <p>Key challenges include:</p>
+                <ul style="color: #ccc; line-height: 1.8; margin-left: 20px; margin-bottom: 20px;">
+                    <li>Lack of centralized data management</li>
+                    <li>Difficulty in tracking sales trends across locations</li>
+                    <li>Inability to monitor customer behavior effectively</li>
+                    <li>Challenges in inventory optimization</li>
+                    <li>Measuring marketing ROI accurately</li>
+                </ul>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features-section" class="section">
+                <h2>Features</h2>
+                <div class="features-container">
+            
+                    <div class="feature-card">
+                        <h3>Centralized Data</h3>
+                        <p>All your brand data in one place, accessible from anywhere, with secure role-based access controls.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Custom Reports</h3>
+                        <p>Generate customized reports tailored to your specific business needs and KPIs.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Visual Dashboards</h3>
+                        <p>Interactive visualizations that make complex data easy to understand at a glance.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Solutions Section -->
+            <section id="solutions-section" class="section">
+                <h2>Our Solutions</h2>
+                <div class="solutions-container">
+                    <div class="solution-card">
+                        <h3>Centralized Data Management</h3>
+                        <p>Aggregate data from all sources into a single, unified platform for comprehensive analysis.</p>
+                    </div>
+                    <div class="solution-card">
+                        <h3>Sales & Customer Trend Analysis</h3>
+                        <p>Identify patterns in customer behavior and sales performance to optimize strategies.</p>
+                    </div>
+                    <div class="solution-card">
+                        <h3>Marketing ROI Evaluation</h3>
+                        <p>Measure the effectiveness of marketing campaigns across all channels.</p>
+                    </div>
+                    <div class="solution-card">
+                        <h3>Stock & Inventory Optimization</h3>
+                        <p>Automated inventory tracking and predictive analytics to prevent stockouts and overstocking.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View Dashboard Section -->
+            <section id="view-dashboard-section" class="section">
+                <h2>View Dashboard</h2>
+                <div class="dashboard-container">
+                    <iframe src="https://us3.ca.analytics.ibm.com/bi/?perspective=dashboard&amp;pathRef=.my_folders%2FNew%2Bdata%2Bmodule%2B1&amp;closeWindowOnLastView=true&amp;ui_appbar=false&amp;ui_navbar=false&amp;shareMode=embedded&amp;action=view&amp;mode=dashboard&amp;subView=model0000019619fd11f4_00000000" width="320" height="200" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen=""></iframe></div>
+            </section>
+
+            <!-- Output Section -->
+            <section id="output-section" class="section">
+                <h2>Dashboard Output</h2>
+                <div class="output-container">
+                    <img src="image.png" alt="Dashboard Output" class="dashboard-image">
+                    <p>Sample dashboard output showing key performance indicators and analytics.</p>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section id="team-section" class="section">
+                <h2>Our Team</h2>
+                <div class="team-container">
+                    <div class="team-member">
+                        <h3>ASVATHAMA S K</h3>
+                        <p>927623BAD010</p>
+                    </div>
+                    <div class="team-member">
+                        <h3>GAYATHRI C</h3>
+                        <p>927623BAD034</p>
+                    </div>
+                    <div class="team-member">
+                        <h3>KARTHIKEYAN M</h3>
+                        <p>927623BAD049</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login Form Submission
+            const loginForm = document.getElementById('login-form');
+            const loginPage = document.getElementById('login-page');
+            const appContainer = document.getElementById('app-container');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // Simple validation
+                    if (username && password) {
+                        // Hide login page and show app
+                        loginPage.style.display = 'none';
+                        appContainer.style.display = 'flex';
+                        
+                        // Set home section as active
+                        document.querySelector('.sidebar-menu li[data-target="home-section"]').click();
+                    } else {
+                        alert('Please enter both username and password');
+                    }
+                });
+            }
+            
+            // Sidebar Navigation
+            const menuItems = document.querySelectorAll('.sidebar-menu li');
+            const sections = document.querySelectorAll('.section');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all menu items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active class to clicked menu item
+                    this.classList.add('active');
+                    
+                    // Get target section ID
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // Show target section
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
